@@ -10,6 +10,7 @@ import { Hero } from './hero';
 export class HeroService {
     
     private heroesUrl = 'app/heroes';  // URL to web api
+    private headers = new Headers({'Content-Type': 'application/json'});
     private handleError(error: any): Promise<any> {
         console.error('An error occurred', error); // for demo purposes only
         return Promise.reject(error.message || error);
@@ -28,4 +29,21 @@ export class HeroService {
     getHero(id: number) {
         return this.getHeroes().then( heroes => heroes.find(hero => hero.id === id));
     }
+
+    update(hero: Hero): Promise<Hero> {
+    const url = `${this.heroesUrl}/${hero.id}`;
+    return this.http
+      .put(url, JSON.stringify(hero), {headers: this.headers})
+      .toPromise()
+      .then(() => hero)
+      .catch(this.handleError);
+  }
+
+  create(name: string): Promise<Hero> {
+    return this.http
+      .post(this.heroesUrl, JSON.stringify({name: name}), {headers: this.headers})
+      .toPromise()
+      .then(res => res.json().data)
+      .catch(this.handleError);
+}
 }
